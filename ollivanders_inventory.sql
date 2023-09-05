@@ -27,7 +27,7 @@ from
 wands w
 join wands_property wp on w.code = wp.code
 where wp.is_evil = 0
-and (w.coins_needed) in -- window function required here to identify the cheapest wand per category
+and (w.coins_needed) in -- subquery required here to identify the cheapest wand per category
 (
     select
     min(coins_needed)
