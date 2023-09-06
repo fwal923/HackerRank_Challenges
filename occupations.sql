@@ -16,16 +16,37 @@ The fourth column is an alphabetically ordered list of Actor names.
 The empty cell data for columns with less than the maximum number of names per occupation (in this case, the Professor and Actor columns) are filled with NULL values.
 */
 
+
+-- OPTION 1: subquery in from clause:
+
 select
 Doctor, Professor, Singer, Actor
 from
+(
+    select
+    row_number() over (partition by Occupation order by Name) as rn, -- row number needs to be added to allow a string pivot as the aggregate used is "max"/ this enables the "max" for each row number rather than the overall max of the string column
+    Name,
+    Occupation
+    from occupations
+) as p
+
+pivot (max(Name) for Occupation in ([Doctor], [Professor], [Singer], [Actor])) as pvt -- aggregation of string requires additional column in CTE
+order by rn
+
+-- OPTION 2: CTE
+
+WITH p as
 (
     select
     row_number() over (partition by Occupation order by Name) as rn,
     Name,
     Occupation
     from occupations
-) as p
+)
 
-pivot (max(Name) for Occupation in ([Doctor], [Professor], [Singer], [Actor])) as pvt
+select
+Doctor, Professor, Singer, Actor
+from p
+
+pivot (max(Name) for Occupation in ([Doctor], [Professor], [Singer], [Actor])) as pvt -- aggregation of string requires additional column in CTE
 order by rn
