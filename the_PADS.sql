@@ -45,7 +45,6 @@ ORDER BY
 WITH
   table_occ_count AS (
   SELECT
-    rank () OVER (ORDER BY occupation) AS ranking,
     LOWER(occupation) AS lower_occupation,
     COUNT(occupation) AS occupation_count
   FROM
